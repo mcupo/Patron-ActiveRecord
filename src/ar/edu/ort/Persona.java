@@ -139,6 +139,11 @@ public class Persona {
 		return null;
 	}
 	
+	public boolean eliminar(Long idPersona) {
+		
+		return false;
+	}
+	
 	public Long obtenerProximoId() {
 		return new Long(12);
 	}
