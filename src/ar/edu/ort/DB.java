@@ -6,17 +6,17 @@ import java.sql.ResultSet;
 
 public class DB {
 
-	public static PreparedStatement prepare(String consultainsert) {
+	public static PreparedStatement prepararConsulta(String consultainsert) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public static void cleanUp(PreparedStatement query) {
+	public static void limpiar(PreparedStatement query) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void cleanUp(PreparedStatement query, ResultSet rs) {
+	public static void limpiar(PreparedStatement query, ResultSet rs) {
 		// TODO Auto-generated method stub
 		
 	}

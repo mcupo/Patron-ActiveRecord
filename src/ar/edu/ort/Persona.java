@@ -6,12 +6,12 @@ import java.sql.SQLException;
 
 /*
 La tabla en SQL seria:
-create table persona (idPersonaa int primary key, apellido varchar,
+create table persona (idPersona int primary key, apellido varchar,
 nombre varchar, cantidadHijos int)
 */
 public class Persona {
 
-	private long 	idPersona;
+	private Long 	idPersona;
 	private String 	apellido;
 	private String 	nombre;
 	private int 	cantidadHijos;
@@ -39,22 +39,56 @@ public class Persona {
 		this.nombre 		= nombre;
 		this.cantidadHijos 	= cantidadHijos;
 	}
+	
+	public Long getIdPersona() {
+		return idPersona;
+	}
 
-	public static Persona buscar(Long idPersona) {
+	public void setIdPersona(long idPersona) {
+		this.idPersona = idPersona;
+	}
+
+	public String getApellido() {
+		return apellido;
+	}
+
+	public void setApellido(String apellido) {
+		this.apellido = apellido;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public int getCantidadHijos() {
+		return cantidadHijos;
+	}
+
+	public void setCantidadHijos(int cantidadHijos) {
+		this.cantidadHijos = cantidadHijos;
+	}
+
+	public static Persona buscar(Long idPersona) {		
+		Persona resultado = null;
 		PreparedStatement query = null;
 		ResultSet rs = null;
 		try {
-			query = DB.prepare(consultaBusqueda);
+			query = DB.prepararConsulta(consultaBusqueda);
 			query.setLong(1, idPersona.longValue());
 			rs = query.executeQuery();
 			rs.next();
-			rs = cargar(rs);
-			return rs;
+			resultado = cargar(rs);
+			return resultado;
 		} catch (SQLException e) {
 			//...
 		} finally {
-			DB.cleanUp(query, rs);
+			DB.limpiar(query, rs);
 		}
+		return null;
 	}
 
 	public static Persona buscar(long idPersona) {
@@ -73,35 +107,40 @@ public class Persona {
 	public void actualizar() {
 		PreparedStatement query = null;
 		try {
-			query = DB.prepare(consultaUpdate);
+			query = DB.prepararConsulta(consultaUpdate);
 			query.setString(1, apellido);
 			query.setString(2, nombre);
 			query.setInt(3, cantidadHijos);
-			query.setInt(4, getID().intValue());
+			query.setInt(4, getIdPersona().intValue());
 			query.execute();
 		} catch (Exception e) {
 			//...
 		} finally {
-			DB.cleanUp(query);
+			DB.limpiar(query);
 		}
 	}
 
 	public Long agregar() {
 		PreparedStatement query = null;
 		try {
-			query = DB.prepare(consultaInsert);
-			setID(findNextDatabaseId());
-			query.setInt(1, getID().intValue());
+			query = DB.prepararConsulta(consultaInsert);
+			setIdPersona(obtenerProximoId());
+			query.setInt(1, getIdPersona().intValue());
 			query.setString(2, apellido);
 			query.setString(3, nombre);
 			query.setInt(4, cantidadHijos);
 			query.execute();
-			return getID();
+			return getIdPersona();
 		} catch (Exception e) {
 			//...
 		} finally {
-			DB.cleanUp(query);
+			DB.limpiar(query);
 		}
+		return null;
+	}
+	
+	public Long obtenerProximoId() {
+		return new Long(12);
 	}
 
 	public float calcularGanancias() {
