@@ -1,15 +1,17 @@
 package ar.edu.ort;
 
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+@SuppressWarnings("unused")
 
 /*
 La tabla en SQL seria:
 create table persona (idPersona int primary key, apellido varchar,
 nombre varchar, cantidadHijos int)
 */
-public class Persona {
+public class Persona implements Persistible {
 
 	private Long 	idPersona;
 	private String 	apellido;
@@ -32,6 +34,13 @@ public class Persona {
 	private final static String consultaDelete =
 	"DELETE FROM persona" +
 	"WHERE idPersonaa = ?";
+	
+	public Persona() {
+		this.idPersona 		= new Long(0);
+		this.apellido 		= "";
+		this.nombre 		= "";
+		this.cantidadHijos 	= 0;
+	}
 
 	public Persona(Long idPersona, String apellido, String nombre, int cantidadHijos) {
 		this.idPersona 		= idPersona;
@@ -72,7 +81,8 @@ public class Persona {
 		this.cantidadHijos = cantidadHijos;
 	}
 
-	public static Persona buscar(Long idPersona) {		
+	@Override
+	public void buscar(Long idPersona) {		
 		Persona resultado = null;
 		PreparedStatement query = null;
 		ResultSet rs = null;
@@ -81,29 +91,27 @@ public class Persona {
 			query.setLong(1, idPersona.longValue());
 			rs = query.executeQuery();
 			rs.next();
-			resultado = cargar(rs);
-			return resultado;
+			cargar(rs);
 		} catch (SQLException e) {
 			//...
 		} finally {
 			DB.limpiar(query, rs);
 		}
-		return null;
 	}
 
-	public static Persona buscar(long idPersona) {
-		return buscar(new Long(idPersona));
+	public void buscar(long idPersona) {
+		buscar(new Long(idPersona));
 	}
 
-	public static Persona cargar(ResultSet rs) throws SQLException {
-		Long idPersona = new Long(rs.getLong(1));
-		String parametroApellido = rs.getString(2);
-		String parametroNombre = rs.getString(3);
-		int parametroCantHijos = rs.getInt(4);
-		Persona resultado = new Persona(idPersona, parametroApellido, parametroNombre, parametroCantHijos);
-		return resultado;
+	@Override
+	public void cargar(ResultSet rs) throws SQLException {
+		idPersona 		= new Long(rs.getLong(1));
+		apellido 		= rs.getString(2);
+		nombre 			= rs.getString(3);
+		cantidadHijos 	= rs.getInt(4);
 	}
 
+	@Override
 	public void actualizar() {
 		PreparedStatement query = null;
 		try {
@@ -120,6 +128,7 @@ public class Persona {
 		}
 	}
 
+	@Override
 	public Long agregar() {
 		PreparedStatement query = null;
 		try {
@@ -139,13 +148,25 @@ public class Persona {
 		return null;
 	}
 	
-	public boolean eliminar(Long idPersona) {
-		
+	@Override
+	public boolean eliminar() {
+		PreparedStatement query = null;
+		try {
+			query = DB.prepararConsulta(consultaDelete);
+			query.setInt(1, getIdPersona().intValue());
+			query.execute();
+			return true;
+		} catch (Exception e) {
+			//...
+		} finally {
+			DB.limpiar(query);
+		}
 		return false;
 	}
 	
+	@Override
 	public Long obtenerProximoId() {
-		return new Long(12);
+		return new Long(12);//Debería obtenerlo de la base de datos
 	}
 
 	public float calcularGanancias() {
